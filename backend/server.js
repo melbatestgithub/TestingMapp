@@ -13,13 +13,29 @@ const io = socketIo(server, {
 });
 
 app.use(cors());
+app.use(express.json());
+
+let serviceProviders = [];
+
+app.post('/register', (req, res) => {
+    const { id, type, location } = req.body;
+    serviceProviders.push({ id, type, location });
+    res.status(200).send('Service provider registered');
+});
+
+app.get('/providers', (req, res) => {
+    const { lat, lng, type } = req.query;
+    const nearbyProviders = serviceProviders.filter(provider => {
+        const distance = Math.sqrt(
+            Math.pow(provider.location.lat - lat, 2) + Math.pow(provider.location.lng - lng, 2)
+        );
+        return distance < 0.1 && provider.type === type; // Adjust the distance threshold as needed
+    });
+    res.json(nearbyProviders);
+});
 
 io.on('connection', (socket) => {
     console.log('New client connected');
-
-    socket.on('updateLocation', (location) => {
-        io.emit('locationUpdate', location);
-    });
 
     socket.on('disconnect', () => {
         console.log('Client disconnected');
