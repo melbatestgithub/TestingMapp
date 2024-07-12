@@ -20,7 +20,7 @@ let serviceProviders = [];
 app.post('/register', (req, res) => {
     const { id, type, location } = req.body;
     serviceProviders.push({ id, type, location });
-    res.status(200).send('Service provider registered');
+    res.status(200).send('Service is provider registered');
 });
 
 app.get('/providers', (req, res) => {
